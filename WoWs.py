@@ -196,3 +196,15 @@ class WoWsClass:
             point += 1
 
         return point
+	
+	def itisjustajoke(self):
+		# Make player's stat all 99999
+		print('The data above is not accurate!\nDisplaying Accurate Data')
+		print('Service level: 99')
+        print('Total battles: 99999'
+        print('Win rate: 100%')
+        print('Average EXP: 9999')
+        print('Average damage: 99999')
+        print('Kill / Death Ratio: NEVER DIED!')
+        print('Main battery hit ratio: 100%\n')
+		

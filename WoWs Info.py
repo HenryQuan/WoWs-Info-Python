@@ -40,6 +40,9 @@ while keepSearching:
     # Get information and print it out
     playerData = WoWs.getInformationFromId(account_id)
     WoWs.printInformation(playerData, account_id)
+	
+	# Display some random jokes
+	WoWs.itisjustajoke()
 
     # Ask for user input...
     againSearch = input('Would you like to search another player? (y/n): ')
