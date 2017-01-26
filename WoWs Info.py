@@ -2,6 +2,7 @@ from WoWs import *
 
 # Simple Interface
 print('###   WoWs Info Python Alpha   ###\n----------------------------------')
+joke = False
 
 # Infinite loop until user quits
 keepSearching = True
@@ -37,12 +38,13 @@ while keepSearching:
     # Print out user's id and get information about it
     print('\nYour Account ID is ' + str(account_id))
 
-    # Get information and print it out
+    # Get information from account_id and print it out
     playerData = WoWs.getInformationFromId(account_id)
     WoWs.printInformation(playerData, account_id)
-	
-	# Display some random jokes
-	WoWs.itisjustajoke()
+
+    # Display some random jokes
+    if joke == True:
+        WoWs.itisjustajoke()
 
     # Ask for user input...
     againSearch = input('Would you like to search another player? (y/n): ')

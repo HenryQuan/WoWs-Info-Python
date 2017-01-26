@@ -2,6 +2,7 @@ import requests
 import json
 import datetime
 
+
 class WoWsClass:
     # There are four servers available
     Russia = 0
@@ -31,15 +32,15 @@ class WoWsClass:
     # Setup API url string
     def setAPI(self):
         self.playerAPI = 'https://api.worldofwarships.' + str(self.server) + \
-            '/wows/account/list/?application_id=' + str(self.application_id)
+                         '/wows/account/list/?application_id=' + str(self.application_id)
         self.playerDataAPI = 'https://api.worldofwarships.' + str(self.server) + \
-            '/wows/account/info/?application_id=' + str(self.application_id)
+                             '/wows/account/info/?application_id=' + str(self.application_id)
 
     # Search for username
     def getUsername(self, name):
 
-        postdata = dict(search = name, language = 'en')
-        username = requests.post(self.playerAPI, data = postdata)
+        postdata = dict(search=name, language='en')
+        username = requests.post(self.playerAPI, data=postdata)
         return username.text
 
     # Print out all possible names and ids
@@ -61,9 +62,9 @@ class WoWsClass:
                 print('\nThere are ' + str(element) + ' matches')
 
             i = 0
-            while(i < element):
+            while (i < element):
                 print('{:3d}'.format(i + 1) + ': ' +
-                    str(nameAndIdJson['data'][i]['nickname']))
+                      str(nameAndIdJson['data'][i]['nickname']))
                 i += 1
 
             # Return raw data
@@ -104,8 +105,8 @@ class WoWsClass:
     # Get some information about that account id
     def getInformationFromId(self, account_id):
 
-        postdata = dict(account_id = account_id, language = 'en')
-        playerData = requests.post(self.playerDataAPI, data = postdata)
+        postdata = dict(account_id=account_id, language='en')
+        playerData = requests.post(self.playerDataAPI, data=postdata)
         if playerData is None or '"error"' in playerData:
             print('Input String is not valid')
             # Quit this app
@@ -194,17 +195,15 @@ class WoWsClass:
             point += 3
         elif 0.5 < averageBattles <= 1.0:
             point += 1
-
         return point
-	
-	def itisjustajoke(self):
-		# Make player's stat all 99999
-		print('The data above is not accurate!\nDisplaying Accurate Data')
-		print('Service level: 99')
-        print('Total battles: 99999'
+
+    def itisjustajoke(self):
+        # Make player's stat all 99999
+        print('The data above is not accurate!\nDisplaying Accurate Data')
+        print('Service level: 99')
+        print('Total battles: 99999')
         print('Win rate: 100%')
         print('Average EXP: 9999')
         print('Average damage: 99999')
         print('Kill / Death Ratio: NEVER DIED!')
         print('Main battery hit ratio: 100%\n')
-		
