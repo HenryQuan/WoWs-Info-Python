@@ -118,51 +118,73 @@ class WoWsClass:
             playerDataJson = json.loads(playerData.text)
             return playerDataJson
 
-    def getinformationForToday(self, account_id):
+    def getDataForDate(self, dataOne, dataTwo):
+
+        # Calculate dataOne - dataTwo
+        if dataOne == '' or dataTwo == '':
+            # There is no data inside dataOne
+            return (0, 0, 0, 0, 0)
+
+        winRate = 0
+        averageXp = 0
+        killDeathRatio = 0
+        averageDamage = 0
+
+        battles = int(dataOne['battles']) - int(dataTwo['battles'])
+        xp = int(dataOne['xp']) - int(dataTwo['xp'])
+        win = int(dataOne['wins']) - int(dataTwo['wins'])
+        survived = int(dataOne['survived_battles']) - int(dataTwo['survived_battles'])
+        frags = int(dataOne['frags']) - int(dataTwo['frags'])
+        damage = int(dataOne['damage_dealt']) - int(dataTwo['damage_dealt'])
+        death = battles - survived
+        if death == 0:
+            death = 1
+
+        if battles > 0:
+            winRate = win / battles * 100
+            averageXp = xp / battles
+            killDeathRatio = frags / death
+            averageDamage = damage / battles
+
+        return (winRate, averageXp, killDeathRatio, averageDamage, battles)
+
+    def getinformationForTodayAndYesterday(self, account_id):
 
         # Get date string for today and yesterday
         today = datetime.date.today().strftime('%Y%m%d')
         yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y%m%d')
-        dateString = str(today) + ',' + str(yesterday)
+        daybefore = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y%m%d')
+        dateString = str(today) + ',' + str(yesterday) + ',' + str(daybefore)
 
         postdata = dict(account_id=account_id, language='en', dates=dateString)
-        playerDataToday = requests.post(self.playerDataByDateAPI, data=postdata)
-        if playerDataToday is None or '"error"' in playerDataToday:
+        playerData = requests.post(self.playerDataByDateAPI, data=postdata)
+        if playerData is None or '"error"' in playerData:
             print('Input String is not valid')
             # Quit this app
             exit(1)
         else:
-            playerDataTodayJson = json.loads(playerDataToday.text)
-            if not str(today) in playerDataTodayJson:
-                print('There is currently no data for today')
+            playerDataJson = json.loads(playerData.text)
+            if not str(today) in playerDataJson and not str(yesterday in playerDataJson):
+                print('There is currently no data for today and yesterday')
                 return ''
             else:
                 # Get useful information
-                yesterdayData = playerDataToday[str(yesterday)]
-                todayData = playerDataToday[str(today)]
+                yesterdayData = ''
+                todayData = ''
+                daybeforeData = ''
+                if str(yesterday) in playerDataJson['data'][str(account_id)]['pvp']:
+                    yesterdayData = playerDataJson['data'][str(account_id)]['pvp'][str(yesterday)]
+                if str(today) in playerDataJson['data'][str(account_id)]['pvp']:
+                    todayData = playerDataJson['data'][str(account_id)]['pvp'][str(today)]
+                if str(daybefore) in playerDataJson['data'][str(account_id)]['pvp']:
+                    daybeforeData = playerDataJson['data'][str(account_id)]['pvp'][str(daybefore)]
 
-                battles = int(todayData['battles']) - int(yesterdayData['battles'])
-                xp = int(todayData['xp']) - int(yesterdayData['xp'])
-                win = int(todayData['wins']) - int(yesterdayData['wins'])
-                survived = int(todayData['survived_battles']) - int(yesterdayData['survived_battles'])
-                frags = int(todayData['frags']) - int(yesterdayData['frags'])
-                damage = int(todayData['damage_dealt']) - int(yesterdayData['damage_dealt'])
-                death = battles - survived
-                if death == 0:
-                    death = 1
+                dataToday =  self.getDataForDate(todayData, yesterdayData)
+                dataYesterday = self.getDataForDate(yesterdayData, daybeforeData)
+                TYData = dataToday + dataYesterday
 
-                if battles == 0:
-                    winRate = 0
-                    averageXp = 0
-                    killDeathRatio = 0
-                    averageDamage = 0
-                else:
-                    winRate = win / battles
-                    averageXp = xp / battles
-                    killDeathRatio = frags / death
-                    averageDamage = damage / battles
-
-                return dict[winRate, averageXp, killDeathRatio, averageDamage, battles]
+                # Today and Yesterday data
+                return TYData
 
     # print out useful for this player
     def printInformation(self, data, account_id, todayData):
@@ -173,16 +195,26 @@ class WoWsClass:
         killdeathRatioToday = 0
         battleToday = 0
 
+        winRateY = 0
+        averageDamageY = 0
+        averageXpY = 0
+        killdeathRatioY = 0
+        battleY = 0
+
+        # Get data for today and yesterday
         if todayData == True:
-            playerDataToday = self.getinformationForToday(account_id)
+            playerDataToday = self.getinformationForTodayAndYesterday(account_id)
             if not str(playerDataToday) == '':
-                winRateToday = dict[0]
-                averageXpToday = dict[1]
-                killdeathRatioToday = dict[2]
-                averageDamageToday = dict[3]
-                battleToday = dict[4]
-
-
+                winRateToday = playerDataToday[0]
+                averageXpToday = playerDataToday[1]
+                killdeathRatioToday = playerDataToday[2]
+                averageDamageToday = playerDataToday[3]
+                battleToday = playerDataToday[4]
+                winRateY = playerDataToday[5]
+                averageXpY = playerDataToday[6]
+                killdeathRatioY = playerDataToday[7]
+                averageDamageY = playerDataToday[8]
+                battleY = playerDataToday[9]
 
         # Date created
         usefulData = data['data'][str(account_id)];
@@ -228,12 +260,20 @@ class WoWsClass:
         print('\n' + str(username) + ' | ' + str(dateDiff) + ' day(s)')
         print('Service level: ' + str(serviceLevel))
         print('Total battles: ' + str(totalBattles) + ' ('
-              + '{:.2f}'.format(averageBattlesPerDay) + '/day)' + ' | ' + str(battleToday))
-        print('Win rate: ' + '{:.2f}'.format(winRate) + '%' + ' | ' + '{:.2f}'.format(winRateToday) + '%')
-        print('Average EXP: ' + '{:.0f}'.format(averageXp) + ' | ' + '{:.0f}'.format(averageXpToday))
-        print('Average damage: ' + '{:.0f}'.format(averageDamage) + ' | ' + '{:.0f}'.format(averageDamageToday))
-        print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio) + '%' +
-              ' | ' + '{:.2f}'.format(killdeathRatioToday) + '%')
+              + '{:.2f}'.format(averageBattlesPerDay) + '/day)'
+              + ' | ' + str(battleToday) + ' | ' + str(battleY))
+        print('Win rate: ' + '{:.2f}'.format(winRate) + '%'
+              + ' | ' + '{:.2f}'.format(winRateToday) + '%'
+              + ' | ' + '{:.2f}'.format(winRateY) + '%')
+        print('Average EXP: ' + '{:.0f}'.format(averageXp)
+              + ' | ' + '{:.0f}'.format(averageXpToday)
+              + ' | ' + '{:.0f}'.format(averageXpY))
+        print('Average damage: ' + '{:.0f}'.format(averageDamage)
+              + ' | ' + '{:.0f}'.format(averageDamageToday)
+              + ' | ' + '{:.0f}'.format(averageDamageY))
+        print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio) + '%'
+              + ' | ' + '{:.2f}'.format(killdeathRatioToday) + '%'
+              + ' | ' + '{:.2f}'.format(killdeathRatioY) + '%')
         print('Main battery hit ratio: ' + '{:.2f}'.format(hitRatio) + '%')
         point = self.activePoint(averageBattlesPerDay, serviceLevel)
         if point >= 5:
