@@ -42,11 +42,12 @@ while keepSearching:
 
         # Get information from account_id and print it out
         playerData = WoWs.getInformationFromId(account_id)
-        WoWs.printInformation(playerData, account_id)
+        WoWs.printInformation(playerData, account_id, True)
 
         # Display some random jokes
         if joke == True:
             WoWs.itisjustajoke()
+            joke = False
     except:
         print("Error: ", sys.exc_info()[0])
     finally:

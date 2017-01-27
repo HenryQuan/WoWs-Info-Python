@@ -1,7 +1,7 @@
 import requests
 import json
 import datetime
-
+import time
 
 class WoWsClass:
     # There are four servers available
@@ -18,6 +18,7 @@ class WoWsClass:
     # World of Warship Asia official API
     playerAPI = ''
     playerDataAPI = ''
+    playerDataByDateAPI = ''
 
     # Set server type and application_id
     def __init__(self, serverID, application_id):
@@ -35,6 +36,8 @@ class WoWsClass:
                          '/wows/account/list/?application_id=' + str(self.application_id)
         self.playerDataAPI = 'https://api.worldofwarships.' + str(self.server) + \
                              '/wows/account/info/?application_id=' + str(self.application_id)
+        self.playerDataByDateAPI = 'https://api.worldofwarships.' + str(self.server) + \
+                                   '/wows/account/statsbydate/?application_id=' + str(self.application_id)
 
     # Search for username
     def getUsername(self, name):
@@ -115,8 +118,71 @@ class WoWsClass:
             playerDataJson = json.loads(playerData.text)
             return playerDataJson
 
+    def getinformationForToday(self, account_id):
+
+        # Get date string for today and yesterday
+        today = datetime.date.today().strftime('%Y%m%d')
+        yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y%m%d')
+        dateString = str(today) + ',' + str(yesterday)
+
+        postdata = dict(account_id=account_id, language='en', dates=dateString)
+        playerDataToday = requests.post(self.playerDataByDateAPI, data=postdata)
+        if playerDataToday is None or '"error"' in playerDataToday:
+            print('Input String is not valid')
+            # Quit this app
+            exit(1)
+        else:
+            playerDataTodayJson = json.loads(playerDataToday.text)
+            if not str(today) in playerDataTodayJson:
+                print('There is currently no data for today')
+                return ''
+            else:
+                # Get useful information
+                yesterdayData = playerDataToday[str(yesterday)]
+                todayData = playerDataToday[str(today)]
+
+                battles = int(todayData['battles']) - int(yesterdayData['battles'])
+                xp = int(todayData['xp']) - int(yesterdayData['xp'])
+                win = int(todayData['wins']) - int(yesterdayData['wins'])
+                survived = int(todayData['survived_battles']) - int(yesterdayData['survived_battles'])
+                frags = int(todayData['frags']) - int(yesterdayData['frags'])
+                damage = int(todayData['damage_dealt']) - int(yesterdayData['damage_dealt'])
+                death = battles - survived
+                if death == 0:
+                    death = 1
+
+                if battles == 0:
+                    winRate = 0
+                    averageXp = 0
+                    killDeathRatio = 0
+                    averageDamage = 0
+                else:
+                    winRate = win / battles
+                    averageXp = xp / battles
+                    killDeathRatio = frags / death
+                    averageDamage = damage / battles
+
+                return dict[winRate, averageXp, killDeathRatio, averageDamage, battles]
+
     # print out useful for this player
-    def printInformation(self, data, account_id):
+    def printInformation(self, data, account_id, todayData):
+
+        winRateToday = 0
+        averageDamageToday = 0
+        averageXpToday = 0
+        killdeathRatioToday = 0
+        battleToday = 0
+
+        if todayData == True:
+            playerDataToday = self.getinformationForToday(account_id)
+            if not str(playerDataToday) == '':
+                winRateToday = dict[0]
+                averageXpToday = dict[1]
+                killdeathRatioToday = dict[2]
+                averageDamageToday = dict[3]
+                battleToday = dict[4]
+
+
 
         # Date created
         usefulData = data['data'][str(account_id)];
@@ -159,26 +225,27 @@ class WoWsClass:
         averageBattlesPerDay = totalBattles / dateDiff
         username = usefulData['nickname']
 
-        print('\n' + str(username) + ' (' + str(dateDiff) + ' day(s))')
+        print('\n' + str(username) + ' | ' + str(dateDiff) + ' day(s)')
         print('Service level: ' + str(serviceLevel))
         print('Total battles: ' + str(totalBattles) + ' ('
-              + '{:.2f}'.format(averageBattlesPerDay) + ' per day)')
-        print('Win rate: ' + '{:.2f}'.format(winRate) + '%')
-        print('Average EXP: ' + '{:.0f}'.format(averageXp))
-        print('Average damage: ' + '{:.0f}'.format(averageDamage))
-        print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio) + '%')
+              + '{:.2f}'.format(averageBattlesPerDay) + '/day)' + ' | ' + str(battleToday))
+        print('Win rate: ' + '{:.2f}'.format(winRate) + '%' + ' | ' + '{:.2f}'.format(winRateToday) + '%')
+        print('Average EXP: ' + '{:.0f}'.format(averageXp) + ' | ' + '{:.0f}'.format(averageXpToday))
+        print('Average damage: ' + '{:.0f}'.format(averageDamage) + ' | ' + '{:.0f}'.format(averageDamageToday))
+        print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio) + '%' +
+              ' | ' + '{:.2f}'.format(killdeathRatioToday) + '%')
         print('Main battery hit ratio: ' + '{:.2f}'.format(hitRatio) + '%')
         point = self.activePoint(averageBattlesPerDay, serviceLevel)
         if point >= 5:
             print('This player is not active')
 
-        # Newline...
+        # Newline
         print('')
 
     def activePoint(self, averageBattles, serviceLevel):
+
         # If it is more than 5 points... This player is inactivate
         point = 0
-
         if int(serviceLevel) < 13:
             point += 1
         elif int(serviceLevel) < 10:
@@ -194,6 +261,7 @@ class WoWsClass:
             point += 3
         elif 0.5 < averageBattles <= 1.0:
             point += 1
+
         return point
 
     def itisjustajoke(self):
