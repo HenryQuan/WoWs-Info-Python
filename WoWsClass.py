@@ -1,7 +1,6 @@
 import requests
 import json
 import datetime
-import time
 
 class WoWsClass:
     # There are four servers available
@@ -52,7 +51,7 @@ class WoWsClass:
         if jsonString is None or '"error"' in jsonString:
             print('Input String is not valid')
             # Quit this app
-            exit(1)
+            return ''
         else:
             nameAndIdJson = json.loads(jsonString)
             element = len(nameAndIdJson['data'])
@@ -72,16 +71,20 @@ class WoWsClass:
 
             # Return raw data
             return nameAndIdJson
+    def removeWhitespaces(self, inputString):
+        inputString = inputString.replace("\t", "")
+        inputString = inputString.replace(" ", "")
+        return inputString
 
     def enterUsername(self):
 
         # User input
-        name = input('Please enter your user name: ')
+        name = self.removeWhitespaces(input('Please enter your user name: '))
 
         # Loop untill valid input
         while name.isspace() or len(name) < 3:
             print('Input string cannot be empty and should be more than 3 character')
-            name = input('Please enter your user name: ')
+            name = self.removeWhitespaces(input('Please enter your user name: '))
 
         # Get and print out all names (100 results at most)
         dataText = self.getUsername(name)
@@ -113,7 +116,7 @@ class WoWsClass:
         if playerData is None or '"error"' in playerData:
             print('Input String is not valid')
             # Quit this app
-            exit(1)
+            return ''
         else:
             playerDataJson = json.loads(playerData.text)
             return playerDataJson
@@ -264,19 +267,19 @@ class WoWsClass:
         print('Service level: ' + str(serviceLevel))
         print('Total battles: ' + str(totalBattles) + ' ('
               + '{:.2f}'.format(averageBattlesPerDay) + '/day)'
-              + ' | ' + str(battleToday) + ' | ' + str(battleY))
+              + (' | ' + str(battleToday) + ' | ' + str(battleY) if todayData else ''))
         print('Win rate: ' + '{:.2f}'.format(winRate) + '%'
-              + ' | ' + '{:.2f}'.format(winRateToday) + '%'
-              + ' | ' + '{:.2f}'.format(winRateY) + '%')
+              + (' | ' + '{:.2f}'.format(winRateToday) + '%'
+              + ' | ' + '{:.2f}'.format(winRateY) + '%' if todayData else ''))
         print('Average EXP: ' + '{:.0f}'.format(averageXp)
-              + ' | ' + '{:.0f}'.format(averageXpToday)
-              + ' | ' + '{:.0f}'.format(averageXpY))
+              + (' | ' + '{:.0f}'.format(averageXpToday)
+              + ' | ' + '{:.0f}'.format(averageXpY) if todayData else ''))
         print('Average damage: ' + '{:.0f}'.format(averageDamage)
-              + ' | ' + '{:.0f}'.format(averageDamageToday)
-              + ' | ' + '{:.0f}'.format(averageDamageY))
+              + (' | ' + '{:.0f}'.format(averageDamageToday)
+              + ' | ' + '{:.0f}'.format(averageDamageY) if todayData else ''))
         print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio)
-              + ' | ' + '{:.2f}'.format(killdeathRatioToday)
-              + ' | ' + '{:.2f}'.format(killdeathRatioY))
+              + (' | ' + '{:.2f}'.format(killdeathRatioToday)
+              + ' | ' + '{:.2f}'.format(killdeathRatioY) if todayData else ''))
         print('Main battery hit ratio: ' + '{:.2f}'.format(hitRatio) + '%')
         point = self.activePoint(averageBattlesPerDay, serviceLevel)
         if point >= 5:
