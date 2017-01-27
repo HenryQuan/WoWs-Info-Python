@@ -159,8 +159,7 @@ class WoWsClass:
         averageBattlesPerDay = totalBattles / dateDiff
         username = usefulData['nickname']
 
-        print('\n' + str(username) + ' starting from ' + dateCreated.strftime("%d/%m/%y")
-              + ' UTC (' + str(dateDiff) + ' day(s))')
+        print('\n' + str(username) + ' (' + str(dateDiff) + ' day(s))')
         print('Service level: ' + str(serviceLevel))
         print('Total battles: ' + str(totalBattles) + ' ('
               + '{:.2f}'.format(averageBattlesPerDay) + ' per day)')
