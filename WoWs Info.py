@@ -8,7 +8,7 @@ joke = False
 # Infinite loop until user quits
 keepSearching = True
 while keepSearching:
-    try:
+    #try:
         WoWs = WoWsClass(3, 'demo')
         dataJson = WoWs.enterUsername()
 
@@ -48,9 +48,9 @@ while keepSearching:
         if joke == True:
             WoWs.itisjustajoke()
             joke = False
-    except:
-        print("Error: ", sys.exc_info()[0])
-    finally:
+    #except:
+    #    print("Error: ", sys.exc_info()[0])
+    #finally:
         # Ask for user input...
         againSearch = input('Would you like to search another player? (y/n): ')
         if againSearch == 'n':

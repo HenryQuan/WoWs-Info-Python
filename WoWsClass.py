@@ -172,12 +172,15 @@ class WoWsClass:
                 yesterdayData = ''
                 todayData = ''
                 daybeforeData = ''
-                if str(yesterday) in playerDataJson['data'][str(account_id)]['pvp']:
-                    yesterdayData = playerDataJson['data'][str(account_id)]['pvp'][str(yesterday)]
-                if str(today) in playerDataJson['data'][str(account_id)]['pvp']:
-                    todayData = playerDataJson['data'][str(account_id)]['pvp'][str(today)]
-                if str(daybefore) in playerDataJson['data'][str(account_id)]['pvp']:
-                    daybeforeData = playerDataJson['data'][str(account_id)]['pvp'][str(daybefore)]
+
+                # Some player does not have enough data
+                if not "\"pvp\":null" in playerData.text:
+                    if str(yesterday) in playerDataJson['data'][str(account_id)]['pvp']:
+                        yesterdayData = playerDataJson['data'][str(account_id)]['pvp'][str(yesterday)]
+                    if str(today) in playerDataJson['data'][str(account_id)]['pvp']:
+                        todayData = playerDataJson['data'][str(account_id)]['pvp'][str(today)]
+                    if str(daybefore) in playerDataJson['data'][str(account_id)]['pvp']:
+                        daybeforeData = playerDataJson['data'][str(account_id)]['pvp'][str(daybefore)]
 
                 dataToday =  self.getDataForDate(todayData, yesterdayData)
                 dataYesterday = self.getDataForDate(yesterdayData, daybeforeData)
@@ -271,9 +274,9 @@ class WoWsClass:
         print('Average damage: ' + '{:.0f}'.format(averageDamage)
               + ' | ' + '{:.0f}'.format(averageDamageToday)
               + ' | ' + '{:.0f}'.format(averageDamageY))
-        print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio) + '%'
-              + ' | ' + '{:.2f}'.format(killdeathRatioToday) + '%'
-              + ' | ' + '{:.2f}'.format(killdeathRatioY) + '%')
+        print('Kill / Death Ratio: ' + '{:.2f}'.format(killdeathRatio)
+              + ' | ' + '{:.2f}'.format(killdeathRatioToday)
+              + ' | ' + '{:.2f}'.format(killdeathRatioY))
         print('Main battery hit ratio: ' + '{:.2f}'.format(hitRatio) + '%')
         point = self.activePoint(averageBattlesPerDay, serviceLevel)
         if point >= 5:
