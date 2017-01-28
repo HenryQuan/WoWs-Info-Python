@@ -153,9 +153,9 @@ class WoWsClass:
     def getinformationForTodayAndYesterday(self, account_id):
 
         # Get date string for today and yesterday
-        today = datetime.date.today().strftime('%Y%m%d')
-        yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y%m%d')
-        daybefore = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y%m%d')
+        today = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y%m%d')
+        yesterday = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y%m%d')
+        daybefore = (datetime.date.today() - datetime.timedelta(days=3)).strftime('%Y%m%d')
         dateString = str(today) + ',' + str(yesterday) + ',' + str(daybefore)
 
         postdata = dict(account_id=account_id, language='en', dates=dateString)
