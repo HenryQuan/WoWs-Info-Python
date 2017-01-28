@@ -2,7 +2,7 @@ from WoWsClass import *
 import sys
 
 # Simple Interface
-print('###   WoWs Info Python Alpha   ###\n----------------------------------')
+print('###   WoWs Info Python Beta   ###\n----------------------------------')
 
 # Whether a joke should be displayed
 joke = False
