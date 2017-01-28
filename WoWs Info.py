@@ -2,8 +2,12 @@ from WoWsClass import *
 import sys
 
 # Simple Interface
-print('###   WoWs Info Python Alpha   ###\n----------------------------------')
+print('###   WoWs Info Python Beta   ###\n----------------------------------')
+
+# Whether a joke should be displayed
 joke = False
+# Whether show today's and yesterday's data
+pastData = True
 
 # Infinite loop until user quits
 keepSearching = True
@@ -42,15 +46,20 @@ while keepSearching:
 
         # Get information from account_id and print it out
         playerData = WoWs.getInformationFromId(account_id)
-        WoWs.printInformation(playerData, account_id)
+
+        if playerData != '':
+            # True for today's and yesterday's data. False for only average data
+            WoWs.printInformation(playerData, account_id, pastData)
 
         # Display some random jokes
         if joke == True:
             WoWs.itisjustajoke()
+            joke = False
+
     except:
-        print("Error: ", sys.exc_info()[0])
+        print("Error:", sys.exc_info()[0])
     finally:
-        # Ask for user input...
+        # Always ask for user input...
         againSearch = input('Would you like to search another player? (y/n): ')
         if againSearch == 'n':
             keepSearching = False
