@@ -33,8 +33,7 @@ class WoWsClass:
     def setAPI(self):
         self.playerAPI = 'https://api.worldofwarships.' + str(self.server) + \
                          '/wows/account/list/?application_id=' + str(self.application_id)
-        self.playerDataAPI = 'https://api.worldofwarships.' + str(self.server) + \
-                             '/wows/account/info/?application_id=' + str(self.application_id)
+        self.playerDataAPI = a' + str(self.application_id)
         self.playerDataByDateAPI = 'https://api.worldofwarships.' + str(self.server) + \
                                    '/wows/account/statsbydate/?application_id=' + str(self.application_id)
 
@@ -186,12 +185,12 @@ class WoWsClass:
                     if str(daybefore) in playerDataJson['data'][str(account_id)]['pvp']:
                         daybeforeData = playerDataJson['data'][str(account_id)]['pvp'][str(daybefore)]
 
-                dataToday =  self.getDataForDate(todayData, yesterdayData)
-                dataYesterday = self.getDataForDate(yesterdayData, daybeforeData)
-                TYData = dataToday + dataYesterday
+                    dataToday =  self.getDataForDate(todayData, yesterdayData)
+                    dataYesterday = self.getDataForDate(yesterdayData, daybeforeData)
+                    TYData = dataToday + dataYesterday
 
-                # Today and Yesterday data
-                return TYData
+                    # Today and Yesterday data
+                    return TYData
 
     # print out useful for this player
     def printInformation(self, data, account_id, todayData):
