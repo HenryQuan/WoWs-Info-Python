@@ -48,9 +48,9 @@ print('\n' + str(expectedDamage) + '\n' + str(expectedFrags) + '\n' + str(expect
 
 # Calculate with your data
 # Change your data here... This is not accurate but only a estimated value. Please visit wows-number for more information
-actualDmg = 99999
-actualWins = 99.9
-actualFrags = 99.9
+actualDmg = 43450
+actualWins = 54.22
+actualFrags = 0.89
 
 rDmg = actualDmg/expectedDamage
 rWins = actualWins/expectedWinRate
@@ -60,6 +60,6 @@ nDmg = max(0, (rDmg - 0.4) / (1 - 0.4))
 nFrags = max(0, (rFrags - 0.1) / (1 - 0.1))
 nWins = max(0, (rWins - 0.7) / (1 - 0.7))
 
-PR = 700 * nDmg + 300 * nFrags + 150 * nWins
+PR = 700 * nDmg + 300 * nFrags + 150 * nWins - 150
 print('Your personal rate is ' + str(PR))
 getRatingComment(PR)
